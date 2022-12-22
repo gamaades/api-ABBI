@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejercicio 2</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js" integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="card-body">
+        <div class="col-md-12">
+            <h1>Historical</h1>
+            <header>
+                <nav>
+                    <ol>
+                        <li><a href="http://localhost:8888/">symbols</a></li>
+                        <li><a href="http://localhost:8888/historical.html">historical</a></li>
+                    </ol>
+                </nav>
+            </header>
+            <p class="buscador">
+                <label>Buscar symbol:</label>
+                <input id="txtBuscador" type="input" value="">
+                <button class="btn btn-info mb-2" id="btnBuscar">Buscar</button>
+            </p>
+            <table id="tabla" class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>symbol</th>
+                        <th>Historical</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        $(() => {
+            get();
+        });
+
+        function get() {
+            var settings = {
+                "url": "http://localhost:9090/api/historical/SPY",
+                "method": "GET",
+                "dataType": "json",
+                crossDomain: true,
+                "timeout": 0,
+                
+            };
+            
+            $.ajax(settings).done(function (response) {
+                console.log(response);
+                $.each(response, function(i, item){
+                    $.each(item.historical, function(ii, iitem){
+                        var row =   "<tr>"+
+                                        "<td>"+ item.symbol + "</td>" +
+                                        "<td> date:"+ iitem.date + "<br>" +
+                                        "close:"+ iitem.close + "</td>" +
+                                    "</tr>";
+                        $("#tabla>tbody").append(row);
+                    });
+                });
+            });   
+        }
+
+        const busca = document.querySelector("#txtBuscador");
+        const boton = document.querySelector("#btnBuscar");
+
+        const filtrar = () => {
+            if (busca.value != "") {
+                $('table tr').remove();
+                var settings = {
+                "url": "http://localhost:9090/api/historical/"+busca.value,
+                "method": "GET",
+                "dataType": "json",
+                crossDomain: true,
+                "timeout": 0,
+                
+            };
+            
+            $.ajax(settings).done(function (response) {
+                console.log(response);
+                $.each(response, function(i, item){
+                    $.each(item.historical, function(ii, iitem){
+                        var row =   "<tr>"+
+                                        "<td>"+ item.symbol + "</td>" +
+                                        "<td> date:"+ iitem.date + "<br>" +
+                                        "close:"+ iitem.close + "</td>" +
+                                    "</tr>";
+                        $("#tabla>tbody").append(row);
+                    });
+                });
+            }); 
+            }
+        }
+
+        boton.addEventListener("click", filtrar);
+    </script>
+</body>
+</html>
